@@ -17,6 +17,7 @@
         <jackson.version>2.18.2</jackson.version>
         <extentreports.version>5.1.2</extentreports.version>
         <maven-surefire.version>3.5.2</maven-surefire.version>
+        <baseUrl>https://fakerestapi.azurewebsites.net</baseUrl>
     </properties>
 
     <dependencies>

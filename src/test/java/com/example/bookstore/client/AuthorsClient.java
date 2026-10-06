@@ -4,7 +4,7 @@ import com.example.bookstore.data.Author;
 import io.restassured.response.Response;
 
 public class AuthorsClient {
-    private static final String RESOURCE = "https://fakerestapi.azurewebsites.net/api/v1/Authors";
+    private static final String RESOURCE = "/api/v1/Authors";
     private final ApiClient apiClient;
 
     public AuthorsClient(ApiClient apiClient) { this.apiClient = apiClient; }

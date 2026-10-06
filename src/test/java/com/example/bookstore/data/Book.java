@@ -1,6 +1,5 @@
 package com.example.bookstore.data;
 
-import java.time.OffsetDateTime;
 
 public record Book(Integer id, String title, String description, Integer pageCount,
                    String excerpt, String publishDate) {

@@ -10,8 +10,8 @@ import static io.restassured.RestAssured.given;
 public class ApiClient {
 
     public ApiClient() {
-        RestAssured.baseURI = ApiConfig.baseUrl();
         RestAssured.reset();
+        RestAssured.baseURI = ApiConfig.baseUrl();
         RestAssured.filters(
                 new RequestLoggingFilter(),
                 new ResponseLoggingFilter()
