@@ -14,8 +14,8 @@ public final class BookTestData {
     public static Book valid(int id) {
         return new Book(
                 id,
-                "The API Automation Handbook",
-                "A test book",
+                RandomUtils.randomString("Tittle - ",8),
+                RandomUtils.randomString("Description - ",15),
                 250,
                 "A practical excerpt for API automation tests.",
                 "2025-02-15T10:00:00Z"
@@ -25,8 +25,8 @@ public final class BookTestData {
     public static Book updated(int id) {
         return new Book(
                 id,
-                "The API Automation Handbook - Updated",
-                "Updated description",
+                RandomUtils.randomString("updated title - ",8),
+                RandomUtils.randomString("updated - ",15),
                 300,
                 "Updated excerpt.",
                 "2025-02-15T10:00:00Z"

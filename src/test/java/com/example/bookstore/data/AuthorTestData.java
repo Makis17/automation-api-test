@@ -15,8 +15,8 @@ public final class AuthorTestData {
         return new Author(
                 id,
                 RandomUtils.randomInt(1, 200),
-                "Test",
-                "Author"
+                RandomUtils.randomString("FirstName - ",8),
+                RandomUtils.randomString("lastName - ",8)
         );
     }
 
@@ -24,8 +24,8 @@ public final class AuthorTestData {
         return new Author(
                 id,
                 RandomUtils.randomInt(1, 200),
-                "Updated",
-                "Author"
+                RandomUtils.randomString("FirstName - ",4),
+                RandomUtils.randomString("lastName - ",5)
         );
     }
 }
