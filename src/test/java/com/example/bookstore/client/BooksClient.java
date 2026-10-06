@@ -4,14 +4,32 @@ import com.example.bookstore.data.Book;
 import io.restassured.response.Response;
 
 public class BooksClient {
-    private static final String RESOURCE = "/api/v1/Books";
+
+    private static final String RESOURCE = "/Books";
+
     private final ApiClient apiClient;
 
-    public BooksClient(ApiClient apiClient) { this.apiClient = apiClient; }
+    public BooksClient(ApiClient apiClient) {
+        this.apiClient = apiClient;
+    }
 
-    public Response getAll() { return apiClient.get(RESOURCE); }
-    public Response getById(int id) { return apiClient.get(RESOURCE + "/" + id); }
-    public Response create(Book book) { return apiClient.post(RESOURCE, book); }
-    public Response update(int id, Book book) { return apiClient.put(RESOURCE + "/" + id, book); }
-    public Response delete(int id) { return apiClient.delete(RESOURCE + "/" + id); }
+    public Response getAll() {
+        return apiClient.get(RESOURCE);
+    }
+
+    public Response getById(int id) {
+        return apiClient.get(RESOURCE + "/" + id);
+    }
+
+    public Response create(Book book) {
+        return apiClient.post(RESOURCE, book);
+    }
+
+    public Response update(int id, Book book) {
+        return apiClient.put(RESOURCE + "/" + id, book);
+    }
+
+    public Response delete(int id) {
+        return apiClient.delete(RESOURCE + "/" + id);
+    }
 }

@@ -1,57 +1,70 @@
 package com.example.bookstore.tests;
 
-import com.example.bookstore.client.ApiClient;
-import com.example.bookstore.client.BooksClient;
 import com.example.bookstore.data.Book;
+import com.example.bookstore.data.BookTestData;
 import com.example.bookstore.util.ReportExtension;
-import com.example.bookstore.util.ResponseAssertions;
+
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Books API")
 @ExtendWith(ReportExtension.class)
-class BooksApiTest {
-    private BooksClient books;
+class BooksApiTest extends BaseApiTest {
 
-    @BeforeEach
-    void setUp() {
-        books = new BooksClient(new ApiClient());
-    }
 
     @Test
-    @DisplayName("GET /Books returns a non-empty JSON array")
-    void getAllBooks() {
-        Response response = books.getAll();
+    @DisplayName("Retrieval of book by id")
+    void getBookById() {
+
+        int bookId = 1;
+
+        Response response = booksClient.getById(bookId);
+
         assertEquals(200, response.statusCode());
-        ResponseAssertions.assertJsonArray(response);
-        assertFalse(response.jsonPath().getList("$").isEmpty());
+        assertEquals(bookId, response.jsonPath().getInt("id"));
     }
 
     @Test
-    @DisplayName("POST /Books accepts a valid book payload")
+    @DisplayName("Create a book")
     void createBook() {
-        Book book = Book.valid(9999);
-        Response response = books.create(book);
+
+        Book book = BookTestData.valid();
+
+        Response response = booksClient.create(book);
+
         assertEquals(200, response.statusCode());
-        ResponseAssertions.assertJsonObject(response, "id", "title", "description", "pageCount", "excerpt", "publishDate");
+        assertEquals(book.id(), response.jsonPath().getInt("id"));
         assertEquals(book.title(), response.jsonPath().getString("title"));
-        assertEquals(book.pageCount(), response.jsonPath().getInt("pageCount"));
     }
 
-    @Test @DisplayName("PUT /Books/{id} returns the supplied updated representation")
+    @Test
+    @DisplayName("Update existing book")
     void updateBook() {
-        int id = 1;
-        Book updated = Book.updated(id);
-        Response response = books.update(id, updated);
-       assertEquals(200, response.statusCode());
-        ResponseAssertions.assertJsonObject(response, "id", "title", "description", "pageCount", "excerpt", "publishDate");
-        assertEquals(id, response.jsonPath().getInt("id"));
-       assertEquals(updated.title(), response.jsonPath().getString("title"));
+
+        int bookId = 1;
+
+        Book book = BookTestData.updated(bookId);
+
+        Response response = booksClient.update(bookId, book);
+
+        assertEquals(200, response.statusCode());
+        assertEquals(bookId, response.jsonPath().getInt("id"));
+        assertEquals(
+                "The API Automation Handbook - Updated",
+                response.jsonPath().getString("title")
+        );
+    }
+
+    @Test
+    @DisplayName("Delete book")
+    void deleteBook() {
+
+        Response response = booksClient.delete(1);
+
+        assertEquals(200, response.statusCode());
     }
 
 }

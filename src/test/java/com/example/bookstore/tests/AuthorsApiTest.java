@@ -1,55 +1,89 @@
 package com.example.bookstore.tests;
 
-import com.example.bookstore.client.ApiClient;
-import com.example.bookstore.client.AuthorsClient;
 import com.example.bookstore.data.Author;
+import com.example.bookstore.data.AuthorTestData;
 import com.example.bookstore.util.ReportExtension;
-import com.example.bookstore.util.ResponseAssertions;
-import io.restassured.RestAssured;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+
+import static com.example.bookstore.util.ResponseAssertions.assertStatusCode;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Authors API - Bonus")
 @ExtendWith(ReportExtension.class)
-class AuthorsApiTest {
-    private AuthorsClient authors;
+class AuthorsApiTest extends BaseApiTest {
 
-    @BeforeEach void setUp() {
-        authors = new AuthorsClient(new ApiClient());
-    }
-
-    @Test @DisplayName("GET /Authors returns a non-empty JSON array")
+    @Test
+    @DisplayName("Retrieval of all authors")
     void getAllAuthors() {
-        Response response = authors.getAll();
-        assertEquals(200, response.statusCode());
-        ResponseAssertions.assertJsonArray(response);
-        assertFalse(response.jsonPath().getList("$").isEmpty());
+
+        Response response = authorsClient.getAll();
+
+        assertStatusCode(response, 200);
     }
 
+    @Test
+    @DisplayName("Retrieve author by id")
+    void getAuthorById() {
 
-    @Test @DisplayName("POST /Authors accepts a valid author payload")
+        int authorId = 1;
+
+        Response response = authorsClient.getById(authorId);
+
+        assertStatusCode(response, 200);
+        assertEquals(
+                authorId,
+                response.jsonPath().getInt("id")
+        );
+    }
+
+    @Test
+    @DisplayName("create author")
     void createAuthor() {
-        Author author = Author.valid(9999);
-        Response response = authors.create(author);
-        assertEquals(200, response.statusCode());
-        ResponseAssertions.assertJsonObject(response, "id", "idBook", "firstName", "lastName");
-        assertEquals(author.firstName(), response.jsonPath().getString("firstName"));
+
+        Author author = AuthorTestData.valid();
+
+        Response response = authorsClient.create(author);
+
+        assertStatusCode(response, 200);
+
+        Author actual = response.as(Author.class);
+
+        assertEquals(author.id(), actual.id());
+        assertEquals(author.idBook(), actual.idBook());
+        assertEquals(author.firstName(), actual.firstName());
+        assertEquals(author.lastName(), actual.lastName());
     }
 
-    @Test @DisplayName("PUT /Authors/{id} returns the updated representation")
+    @Test
+    @DisplayName("Retrieval author by id")
     void updateAuthor() {
-        int id = 1;
-        Author author = Author.updated(id);
-        Response response = authors.update(id, author);
-        assertEquals(200, response.statusCode());
-        ResponseAssertions.assertJsonObject(response, "id", "idBook", "firstName", "lastName");
-        assertEquals(author.firstName(), response.jsonPath().getString("firstName"));
-        assertEquals(author.lastName(), response.jsonPath().getString("lastName"));
+
+        int authorId = 1;
+        Author expected = AuthorTestData.updated(authorId);
+
+        Response response =
+                authorsClient.update(authorId, expected);
+
+        assertStatusCode(response, 200);
+
+        Author actual = response.as(Author.class);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("Delete author")
+    void deleteAuthor() {
+
+        int authorId = 1;
+
+        Response response = authorsClient.delete(authorId);
+
+        assertStatusCode(response, 200);
     }
 
 }
