@@ -21,15 +21,19 @@ public class AuthorsClient {
         return apiClient.get(RESOURCE + "/" + id);
     }
 
-    public Response create(Author author) {
-        return apiClient.post(RESOURCE, author);
+    public Response create(Object body) {
+        return apiClient.post(RESOURCE, body);
     }
 
     public Response update(int id, Author author) {
         return apiClient.put(RESOURCE + "/" + id, author);
     }
 
-    public Response delete(int id) {
+    public Response update(int id, String body) {
+        return apiClient.put(RESOURCE + "/" + id, body);
+    }
+
+    public Response delete(Object id) {
         return apiClient.delete(RESOURCE + "/" + id);
     }
 }

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 
+import static com.example.bookstore.util.ResponseAssertions.assertResponseTitle;
 import static com.example.bookstore.util.ResponseAssertions.assertStatusCode;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class AuthorsApiTest extends BaseApiTest {
 
     @Test
-    @DisplayName("Retrieval of all authors")
+    @DisplayName("Retrieve all authors")
     void getAllAuthors() {
 
         Response response = authorsClient.getAll();
@@ -41,7 +42,20 @@ class AuthorsApiTest extends BaseApiTest {
     }
 
     @Test
-    @DisplayName("create author")
+    @DisplayName("Retrieve author by id that does not exists")
+    void getAuthorByIdInvalid() {
+
+        int authorId = -1;
+
+        Response response = authorsClient.getById(authorId);
+
+        assertStatusCode(response, 404);
+        assertResponseTitle(response, "Not Found");
+
+    }
+
+    @Test
+    @DisplayName("Create author")
     void createAuthor() {
 
         Author author = AuthorTestData.valid();
@@ -59,10 +73,116 @@ class AuthorsApiTest extends BaseApiTest {
     }
 
     @Test
-    @DisplayName("Retrieval author by id")
+    @DisplayName("Create author with string id")
+    void createAuthorWithStringId() {
+
+
+        String invalidBody = """
+                {
+                    "id": "invalid-id",
+                    "idBook": 1,
+                    "firstName": "John",
+                    "lastName": "Smith"
+                }
+                """;
+
+        Response response = authorsClient.create(invalidBody);
+
+        assertStatusCode(response, 400);
+        assertResponseTitle(response, "One or more validation errors occurred.");
+
+    }
+
+    @Test
+    @DisplayName("Create author with large id")
+    void createAuthorWithLargeId() {
+
+
+        String invalidBody = """
+                {
+                    "id": "2147883648",
+                    "idBook": 1,
+                    "firstName": "John",
+                    "lastName": "Smith"
+                }
+                """;
+
+        Response response = authorsClient.create(invalidBody);
+
+        assertStatusCode(response, 400);
+        assertResponseTitle(response, "One or more validation errors occurred.");
+
+    }
+
+    @Test
+    @DisplayName("Create author with string id")
+    void createAuthorWithStringIdBook() {
+
+
+        String invalidBody = """
+                {
+                    "id": 1,
+                    "idBook": "test,
+                    "firstName": "John",
+                    "lastName": "Smith"
+                }
+                """;
+
+        Response response = authorsClient.create(invalidBody);
+
+        assertStatusCode(response, 400);
+        assertResponseTitle(response, "One or more validation errors occurred.");
+
+    }
+
+    @Test
+    @DisplayName("Create author without firstName & lastname")
+    void createAuthorWithoutNames() {
+
+
+        String invalidBody = """
+                {
+                  "id": "abc",
+                  "idBook": 1,
+                  "firstName": null,
+                  "lastName": null
+                }
+                """;
+
+        Response response = authorsClient.create(invalidBody);
+
+        assertStatusCode(response, 400);
+        assertResponseTitle(response, "One or more validation errors occurred.");
+
+    }
+
+    @Test
+    @DisplayName("Create author with large id book")
+    void createAuthorWithSLargeIdBook() {
+
+
+        String invalidBody = """
+                {
+                    "id": 1,
+                    "idBook": 2147883648,
+                    "firstName": "John",
+                    "lastName": "Smith"
+                }
+                """;
+
+        Response response = authorsClient.create(invalidBody);
+
+        assertStatusCode(response, 400);
+        assertResponseTitle(response, "One or more validation errors occurred.");
+
+    }
+
+    @Test
+    @DisplayName("Update author")
     void updateAuthor() {
 
         int authorId = 1;
+
         Author expected = AuthorTestData.updated(authorId);
 
         Response response =
@@ -76,6 +196,100 @@ class AuthorsApiTest extends BaseApiTest {
     }
 
     @Test
+    @DisplayName("update author with string id")
+    void updateAuthorWithStringId() {
+
+        int authorId = 1;
+
+        String body = """
+                {
+                  "id": "test",
+                  "idBook": 1,
+                  "firstName": "John",
+                  "lastName": "Smith"
+                }
+                """;
+
+        Response response =
+                authorsClient.update(authorId, body);
+
+        assertStatusCode(response, 400);
+        assertResponseTitle(response, "One or more validation errors occurred.");
+    }
+
+    @Test
+    @DisplayName("update author with large id")
+    void updateAuthorWithLargeId() {
+
+        int authorId = 1;
+
+        String body = """
+                {
+                  "id": 2147883648,
+                  "idBook": 1,
+                  "firstName": "John",
+                  "lastName": "Smith"
+                }
+                """;
+
+        Response response =
+                authorsClient.update(authorId, body);
+
+        assertStatusCode(response, 400);
+        assertResponseTitle(response, "One or more validation errors occurred.");
+    }
+
+    @Test
+    @DisplayName("update author with header id that does not exists")
+    void updateAuthorWithNotExistingAuthor() {
+
+        int authorId = 11111111;
+
+
+        String body = """
+                {
+                  "id": 2,
+                  "idBook": 1,
+                  "firstName": "John",
+                  "lastName": "Smith"
+                }
+                """;
+
+        Response response =
+                authorsClient.update(authorId, body);
+
+
+        assertStatusCode(response, 200);
+
+    }
+
+    @Test
+    @DisplayName("update author with malformed payload")
+    void updateAuthorWithMalformedPayload() {
+
+        int authorId = 11;
+
+
+        String body = """
+                {
+                  "id2": 2,
+                  "idBoo3k": 1,
+                  "firstame": "John",
+                  "lasName": "Smith"
+                }
+                """;
+
+        Response response =
+                authorsClient.update(authorId, body);
+
+
+        assertStatusCode(response, 200);
+
+
+    }
+
+
+    @Test
     @DisplayName("Delete author")
     void deleteAuthor() {
 
@@ -84,6 +298,27 @@ class AuthorsApiTest extends BaseApiTest {
         Response response = authorsClient.delete(authorId);
 
         assertStatusCode(response, 200);
+    }
+
+    @Test
+    @DisplayName("Delete author")
+    void deleteAuthorThatDoesNotExists() {
+
+        int authorId = -111;
+
+        Response response = authorsClient.delete(authorId);
+
+        assertStatusCode(response, 200);
+    }
+
+    @Test
+    @DisplayName("Delete author with invalid Id")
+    void deleteAuthorWithInvalidId() {
+
+        Response response = authorsClient.delete(null);
+
+        assertStatusCode(response, 400);
+        assertResponseTitle(response, "One or more validation errors occurred.");
     }
 
 }

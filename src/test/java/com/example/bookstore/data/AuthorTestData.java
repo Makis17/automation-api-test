@@ -11,12 +11,13 @@ public final class AuthorTestData {
         return valid(RandomUtils.randomInt(1, 10_000));
     }
 
+
     public static Author valid(int id) {
         return new Author(
                 id,
                 RandomUtils.randomInt(1, 200),
-                RandomUtils.randomString("FirstName - ",8),
-                RandomUtils.randomString("lastName - ",8)
+                RandomUtils.randomString("FirstName - ", 8),
+                RandomUtils.randomString("lastName - ", 8)
         );
     }
 
@@ -24,8 +25,8 @@ public final class AuthorTestData {
         return new Author(
                 id,
                 RandomUtils.randomInt(1, 200),
-                RandomUtils.randomString("FirstName - ",4),
-                RandomUtils.randomString("lastName - ",5)
+                RandomUtils.randomString("FirstName - ", 4),
+                RandomUtils.randomString("lastName - ", 5)
         );
     }
 }

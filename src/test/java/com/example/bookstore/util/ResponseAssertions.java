@@ -16,4 +16,12 @@ public final class ResponseAssertions {
                 "Unexpected HTTP status code"
         );
     }
+    public static void assertResponseTitle(Response response, String expectedTitle) {
+
+        assertEquals(
+                expectedTitle,
+                response.jsonPath().getString("title"),
+                "Unexpected error title"
+        );
+    }
 }
