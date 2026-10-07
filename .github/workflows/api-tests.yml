@@ -23,8 +23,7 @@ jobs:
 
       - name: Run API tests
         run: mvn -B clean test
-        env:
-          BASE_URL: https://fakerestapi.azurewebsites.net
+
 
       - name: Upload test reports
         if: always()
