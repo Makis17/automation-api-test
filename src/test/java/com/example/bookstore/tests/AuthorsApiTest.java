@@ -67,15 +67,41 @@ class AuthorsApiTest extends BaseApiTest {
         Author actual = response.as(Author.class);
 
         assertEquals(author.id(), actual.id());
+
         assertEquals(author.idBook(), actual.idBook());
+
         assertEquals(author.firstName(), actual.firstName());
+
         assertEquals(author.lastName(), actual.lastName());
+    }
+
+    @Test
+    @DisplayName("Create author - verify persistence after retrieval")
+    void createAuthorVerifyPersistence() {
+
+        Author expected = AuthorTestData.valid();
+
+        Response response = authorsClient.create(expected);
+
+        assertStatusCode(response, 200);
+
+        Author actual = response.as(Author.class);
+
+        assertEquals(expected, actual);
+
+        Response getResponse = authorsClient.getById(expected.id());
+
+        assertStatusCode(getResponse, 200);
+
+        Author savedAuthor = getResponse.as(Author.class);
+
+        assertEquals(expected, savedAuthor);
+
     }
 
     @Test
     @DisplayName("Create author with string id")
     void createAuthorWithStringId() {
-
 
         String invalidBody = """
                 {
@@ -89,6 +115,28 @@ class AuthorsApiTest extends BaseApiTest {
         Response response = authorsClient.create(invalidBody);
 
         assertStatusCode(response, 400);
+
+        assertResponseTitle(response, "One or more validation errors occurred.");
+
+    }
+
+    @Test
+    @DisplayName("Create author with malformed payload")
+    void createAuthorWithMalformedPayload() {
+
+        String invalidBody = """
+                {
+                    "id": 1
+                    "idBook": 1,
+                    "firstName": "John",
+                    "lastName": "Smith"
+                }
+                """;
+
+        Response response = authorsClient.create(invalidBody);
+
+        assertStatusCode(response, 400);
+
         assertResponseTitle(response, "One or more validation errors occurred.");
 
     }
@@ -110,6 +158,7 @@ class AuthorsApiTest extends BaseApiTest {
         Response response = authorsClient.create(invalidBody);
 
         assertStatusCode(response, 400);
+
         assertResponseTitle(response, "One or more validation errors occurred.");
 
     }
@@ -117,7 +166,6 @@ class AuthorsApiTest extends BaseApiTest {
     @Test
     @DisplayName("Create author with string id")
     void createAuthorWithStringIdBook() {
-
 
         String invalidBody = """
                 {
@@ -131,6 +179,7 @@ class AuthorsApiTest extends BaseApiTest {
         Response response = authorsClient.create(invalidBody);
 
         assertStatusCode(response, 400);
+
         assertResponseTitle(response, "One or more validation errors occurred.");
 
     }
@@ -138,7 +187,6 @@ class AuthorsApiTest extends BaseApiTest {
     @Test
     @DisplayName("Create author without firstName & lastname")
     void createAuthorWithoutNames() {
-
 
         String invalidBody = """
                 {
@@ -152,6 +200,7 @@ class AuthorsApiTest extends BaseApiTest {
         Response response = authorsClient.create(invalidBody);
 
         assertStatusCode(response, 400);
+
         assertResponseTitle(response, "One or more validation errors occurred.");
 
     }
@@ -159,7 +208,6 @@ class AuthorsApiTest extends BaseApiTest {
     @Test
     @DisplayName("Create author with large id book")
     void createAuthorWithSLargeIdBook() {
-
 
         String invalidBody = """
                 {
@@ -173,6 +221,7 @@ class AuthorsApiTest extends BaseApiTest {
         Response response = authorsClient.create(invalidBody);
 
         assertStatusCode(response, 400);
+
         assertResponseTitle(response, "One or more validation errors occurred.");
 
     }
@@ -193,10 +242,39 @@ class AuthorsApiTest extends BaseApiTest {
         Author actual = response.as(Author.class);
 
         assertEquals(expected, actual);
+
     }
 
     @Test
-    @DisplayName("update author with string id")
+    @DisplayName("Update author - Verify persistence")
+    void updateAuthorVerifyPersistence() {
+
+        int authorId = 1;
+
+        Author expected = AuthorTestData.updated(authorId);
+
+        Response response =
+                authorsClient.update(authorId, expected);
+
+        assertStatusCode(response, 200);
+
+        Author actual = response.as(Author.class);
+
+        assertEquals(expected, actual);
+
+        Response getResponse = authorsClient.getById(authorId);
+
+        assertStatusCode(getResponse, 200);
+
+        Author savedAuthor = getResponse.as(Author.class);
+
+        assertEquals(expected, savedAuthor);
+
+    }
+
+
+    @Test
+    @DisplayName("Update author with string id")
     void updateAuthorWithStringId() {
 
         int authorId = 1;
@@ -214,11 +292,12 @@ class AuthorsApiTest extends BaseApiTest {
                 authorsClient.update(authorId, body);
 
         assertStatusCode(response, 400);
+
         assertResponseTitle(response, "One or more validation errors occurred.");
     }
 
     @Test
-    @DisplayName("update author with large id")
+    @DisplayName("Update author with large id")
     void updateAuthorWithLargeId() {
 
         int authorId = 1;
@@ -236,15 +315,15 @@ class AuthorsApiTest extends BaseApiTest {
                 authorsClient.update(authorId, body);
 
         assertStatusCode(response, 400);
+
         assertResponseTitle(response, "One or more validation errors occurred.");
     }
 
     @Test
-    @DisplayName("update author with header id that does not exists")
+    @DisplayName("Update author with header id that does not exists")
     void updateAuthorWithNotExistingAuthor() {
 
         int authorId = 11111111;
-
 
         String body = """
                 {
@@ -258,17 +337,15 @@ class AuthorsApiTest extends BaseApiTest {
         Response response =
                 authorsClient.update(authorId, body);
 
-
-        assertStatusCode(response, 200);
+        assertStatusCode(response, 404);
 
     }
 
     @Test
-    @DisplayName("update author with malformed payload")
-    void updateAuthorWithMalformedPayload() {
+    @DisplayName("Update author with unknown fields")
+    void updateAuthorWithUnknownFields() {
 
         int authorId = 11;
-
 
         String body = """
                 {
@@ -282,12 +359,33 @@ class AuthorsApiTest extends BaseApiTest {
         Response response =
                 authorsClient.update(authorId, body);
 
-
-        assertStatusCode(response, 200);
-
+        assertStatusCode(response, 400);
 
     }
 
+    @Test
+    @DisplayName("Update author with malformed payload")
+    void updateAuthorWithMalformedPayload() {
+
+        int authorId = 11;
+
+        String body = """
+                {
+                  "id": 2,
+                  "idBook": 1,
+                  "firstName": "John"
+                  "lasName": "Smith"
+                }
+                """;
+
+        Response response =
+                authorsClient.update(authorId, body);
+
+        assertStatusCode(response, 400);
+
+        assertResponseTitle(response, "One or more validation errors occurred.");
+
+    }
 
     @Test
     @DisplayName("Delete author")
@@ -301,23 +399,40 @@ class AuthorsApiTest extends BaseApiTest {
     }
 
     @Test
-    @DisplayName("Delete author")
+    @DisplayName("Delete author should not be retrievable")
+    void deleteAuthorNotBeRetrievable() {
+
+        int authorId = 1;
+
+        Response deleteResponse = authorsClient.delete(authorId);
+
+        assertStatusCode(deleteResponse, 200);
+
+        Response getResponse = authorsClient.getById(authorId);
+
+        assertStatusCode(getResponse, 404);
+    }
+
+
+    @Test
+    @DisplayName("Delete author that does not exists")
     void deleteAuthorThatDoesNotExists() {
 
         int authorId = -111;
 
         Response response = authorsClient.delete(authorId);
 
-        assertStatusCode(response, 200);
+        assertStatusCode(response, 404);
     }
 
     @Test
-    @DisplayName("Delete author with invalid Id")
-    void deleteAuthorWithInvalidId() {
+    @DisplayName("Delete author with null Id")
+    void deleteAuthorWithNullId() {
 
         Response response = authorsClient.delete(null);
 
         assertStatusCode(response, 400);
+
         assertResponseTitle(response, "One or more validation errors occurred.");
     }
 
