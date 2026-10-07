@@ -25,11 +25,11 @@ public class BooksClient {
         return apiClient.post(RESOURCE, book);
     }
 
-    public Response update(int id, Book book) {
-        return apiClient.put(RESOURCE + "/" + id, book);
-    }
+    public Response create(String body) {return apiClient.post(RESOURCE, body);}
 
-    public Response delete(int id) {
-        return apiClient.delete(RESOURCE + "/" + id);
-    }
+    public Response update(int id, Book book) {return apiClient.put(RESOURCE + "/" + id, book);}
+
+    public Response update(int id, String body) {return apiClient.put(RESOURCE + "/" + id, body);}
+
+    public Response delete(Object id) { return apiClient.delete(RESOURCE + "/" + id);}
 }

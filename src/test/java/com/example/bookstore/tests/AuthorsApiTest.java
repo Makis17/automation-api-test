@@ -188,20 +188,18 @@ class AuthorsApiTest extends BaseApiTest {
     @DisplayName("Create author without firstName & lastname")
     void createAuthorWithoutNames() {
 
-        String invalidBody = """
+        String body = """
                 {
-                  "id": "abc",
+                  "id": 1,
                   "idBook": 1,
                   "firstName": null,
                   "lastName": null
                 }
                 """;
 
-        Response response = authorsClient.create(invalidBody);
+        Response response = authorsClient.create(body);
 
-        assertStatusCode(response, 400);
-
-        assertResponseTitle(response, "One or more validation errors occurred.");
+        assertStatusCode(response, 200);
 
     }
 

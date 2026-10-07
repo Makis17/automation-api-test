@@ -14,11 +14,11 @@ public final class BookTestData {
     public static Book valid(int id) {
         return new Book(
                 id,
-                RandomUtils.randomString("Tittle - ",8),
+                RandomUtils.randomString("Title - ",8),
                 RandomUtils.randomString("Description - ",15),
-                250,
-                "A practical excerpt for API automation tests.",
-                "2025-02-15T10:00:00Z"
+                RandomUtils.randomInt(2,10),
+                RandomUtils.randomString("excerpt - ",15),
+                "2025-02-11T10:00:00Z"
         );
     }
 
@@ -27,9 +27,9 @@ public final class BookTestData {
                 id,
                 RandomUtils.randomString("updated title - ",8),
                 RandomUtils.randomString("updated - ",15),
-                300,
-                "Updated excerpt.",
-                "2025-02-15T10:00:00Z"
+                RandomUtils.randomInt(2,10),
+                RandomUtils.randomString(" update excerpt - ",15),
+                "2025-02-11T10:00:00Z"
         );
     }
 }
